@@ -1,9 +1,14 @@
 import Link from 'next/link';
+import MainContainer from '../components/MainContainer';
 
-const Index = ({ products }) => {
+const Index = () => {
   //console.log(products);
 
-  return <div>index</div>;
+  return (
+    <>
+      <MainContainer title={'Home'}>index</MainContainer>
+    </>
+  );
 };
 
 export default Index;

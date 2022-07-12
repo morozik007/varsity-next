@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import MainContainer from '../components/MainContainer';
 
 const Catalog = ({ products }) => {
   const { items } = products;
@@ -23,8 +24,7 @@ const Catalog = ({ products }) => {
   //console.log(filteredProducts);
 
   return (
-    <>
-      <div>Catalog</div>
+    <MainContainer title={'Catalog'}>
       <div className="mx-auto max-w-[1088px]">
         <ul className="grid grid-cols-3 gap-4">
           {filteredProducts.map((p) => (
@@ -54,13 +54,13 @@ const Catalog = ({ products }) => {
           ))}
         </ul>
       </div>
-    </>
+    </MainContainer>
   );
 };
 
 export default Catalog;
 
-export async function getServerSideProps(context) {
+export async function getStaticProps(context) {
   const lang =
     context.locale === 'no'
       ? 'default'

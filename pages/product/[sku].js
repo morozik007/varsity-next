@@ -1,10 +1,14 @@
 import Head from 'next/head';
 import Image from 'next/image';
+import MainContainer from '../../components/MainContainer';
 
 export default function Product({ product, language }) {
   product.custom_attributes.forEach((item) => {
     if (item.attribute_code == 'image') {
       product.image = item.value;
+    }
+    if (item.attribute_code == 'short_description') {
+      product.short_description = item.value;
     }
     if (item.attribute_code == 'description_new') {
       product.description_new = item.value;
@@ -23,13 +27,10 @@ export default function Product({ product, language }) {
     }
   });
 
-  //console.log(product);
+  console.log(product);
 
   return (
-    <>
-      <Head>
-        <title>{product.name}</title>
-      </Head>
+    <MainContainer title={product.name}>
       <div className="mx-auto max-w-[1088px] flex flex-row">
         <div className="basis-2/3 pr-10">
           {product.media_gallery_entries &&
@@ -67,11 +68,14 @@ export default function Product({ product, language }) {
         <div className="basis-1/3">
           <h1 className="text-3xl mb-5 text-main">{product.name}</h1>
           <div
+            dangerouslySetInnerHTML={{ __html: product.short_description }}
+          ></div>
+          <div
             dangerouslySetInnerHTML={{ __html: product.description_new }}
           ></div>
         </div>
       </div>
-    </>
+    </MainContainer>
   );
 }
 
