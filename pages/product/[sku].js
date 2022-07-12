@@ -1,8 +1,9 @@
 import Head from 'next/head';
 import Image from 'next/image';
+import Link from 'next/link';
 import MainContainer from '../../components/MainContainer';
 
-export default function Product({ product, language }) {
+export default function Product({ product, products, language }) {
   product.custom_attributes.forEach((item) => {
     if (item.attribute_code == 'image') {
       product.image = item.value;
@@ -27,7 +28,11 @@ export default function Product({ product, language }) {
     }
   });
 
-  console.log(product);
+  const filteredProducts = products.items.filter(
+    (item) => item.type_id !== 'simple' && item.status !== 2
+  );
+
+  //console.log(filteredProducts);
 
   return (
     <MainContainer title={product.name}>
@@ -73,6 +78,15 @@ export default function Product({ product, language }) {
           <div
             dangerouslySetInnerHTML={{ __html: product.description_new }}
           ></div>
+          <hr className="my-5" />
+          <p className="mb-2">
+            <b>Colors</b> serie: {product.filter_series}
+          </p>
+          {filteredProducts.map((color) => (
+            <Link key={color.id} href={`/product/${color.sku}`}>
+              <a className="block mb-1 underline">{color.name}</a>
+            </Link>
+          ))}
         </div>
       </div>
     </MainContainer>
@@ -98,9 +112,16 @@ export async function getServerSideProps(context) {
     `https://magento.varsity.stage.dock.norse.digital/rest/${lang}/V1/products/${context.params.sku}`
   );
   const product = await response.json();
+
+  const responseProducts = await fetch(
+    `https://magento.varsity.stage.dock.norse.digital/rest/V1/products?searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=type_id&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=configurable&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=series&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=303`
+  );
+  const products = await responseProducts.json();
+
   return {
     props: {
       product: product,
+      products: products,
       language: context.locale,
     },
   };
