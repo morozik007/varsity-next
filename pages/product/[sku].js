@@ -4,7 +4,11 @@ import Link from 'next/link';
 import MainContainer from '../../components/MainContainer';
 
 export default function Product({ product, products, language }) {
-  product.custom_attributes.forEach((item) => {
+  const { custom_attributes } = product;
+
+  //console.log(custom_attributes);
+
+  custom_attributes.forEach((item) => {
     if (item.attribute_code == 'image') {
       product.image = item.value;
     }
@@ -32,7 +36,7 @@ export default function Product({ product, products, language }) {
     (item) => item.type_id !== 'simple' && item.status !== 2
   );
 
-  //console.log(filteredProducts);
+  //console.log(product);
 
   return (
     <MainContainer title={product.name}>
@@ -57,10 +61,7 @@ export default function Product({ product, products, language }) {
               return (
                 <Image
                   key={imageIndex}
-                  src={
-                    'https://magento.varsity.stage.dock.norse.digital/pub/media/catalog/product/' +
-                    image.file
-                  }
+                  src={process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + image.file}
                   alt={product.name}
                   width={268}
                   height={175}
@@ -109,19 +110,26 @@ export async function getServerSideProps(context) {
       : 'international';
 
   const response = await fetch(
-    `https://magento.varsity.stage.dock.norse.digital/rest/${lang}/V1/products/${context.params.sku}`
+    `${process.env.API_URL}/rest/${lang}/V1/products/${context.params.sku}`
   );
   const product = await response.json();
 
+  if (!product) {
+    return {
+      notFound: true,
+    };
+  }
+
   const responseProducts = await fetch(
-    `https://magento.varsity.stage.dock.norse.digital/rest/V1/products?searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=type_id&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=configurable&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=series&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=303`
+    `${process.env.API_URL}/rest/${lang}/V1/varsity-products?
+    searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=type_id&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=configurable&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=series&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=303`
   );
   const products = await responseProducts.json();
 
   return {
     props: {
-      product: product,
-      products: products,
+      product,
+      products,
       language: context.locale,
     },
   };

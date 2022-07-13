@@ -21,10 +21,8 @@ const Catalog = ({ products }) => {
     (item) => item.only_for_campaign !== 1 && item.status !== 2
   );
 
-  //console.log(filteredProducts);
-
   return (
-    <MainContainer title={'Catalog'}>
+    <MainContainer title={`Catalog`}>
       <div className="mx-auto max-w-[1088px]">
         <ul className="grid grid-cols-3 gap-4">
           {filteredProducts.map((p) => (
@@ -35,10 +33,7 @@ const Catalog = ({ products }) => {
               <Link href={`/product/${p.sku}`}>
                 <a>
                   <Image
-                    src={
-                      'https://magento.varsity.stage.dock.norse.digital/pub/media/catalog/product/' +
-                      p.image
-                    }
+                    src={process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + p.image}
                     alt={p.name}
                     width={268}
                     height={175}
@@ -73,9 +68,16 @@ export async function getStaticProps(context) {
       : 'international';
 
   const response = await fetch(
-    `https://magento.varsity.stage.dock.norse.digital/rest/${lang}/V1/products?searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4`
+    `${process.env.API_URL}/rest/${lang}/V1/varsity-products?searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4`
   );
   const products = await response.json();
+
+  if (!products) {
+    return {
+      notFound: true,
+    };
+  }
+
   return {
     props: { products },
   };
