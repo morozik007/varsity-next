@@ -216,61 +216,61 @@ export default function Product({ product, colors, catalogPage, language }) {
           <hr className="my-5" />
           <div dangerouslySetInnerHTML={{ __html: product.size_fit }}></div>
         </div>
-        {!products ||
-          (relatedCapsList.length > 0 && (
-            <div className="basis-full">
-              <hr className="my-5" />
-              <h2 className="text-center mb-5 text-lg">Related products</h2>
-              <div className="flex flex-row gap-5">
-                {!products ? (
-                  <Oval
-                    ariaLabel="loading-indicator"
-                    height={30}
-                    width={30}
-                    strokeWidth={5}
-                    color="red"
-                    secondaryColor="red"
-                  />
-                ) : (
-                  relatedCapsList.map((cap) => {
-                    return (
-                      <div key={cap.id} className="basis-1/3 text-center">
-                        {cap.name}
-                        {cap.media_gallery_entries &&
-                          cap.media_gallery_entries.map((image, imageIndex) => {
-                            if (image.types.indexOf('feed_image') >= 0) {
-                              return null;
-                            }
-                            if (
-                              image.types.indexOf('gallery_image_1') >= 0 ||
-                              image.types.indexOf('gallery_image_2') >= 0 ||
-                              image.types.indexOf('gallery_image_3') >= 0 ||
-                              image.types.indexOf('gallery_image_4') >= 0
-                            ) {
-                              return null;
-                            }
+        <div className="basis-full">
+          <hr className="my-5" />
+          <h2 className="text-center mb-5 text-lg">Related products</h2>
+          <div className="flex flex-row gap-5 justify-center">
+            {!products ? (
+              <Oval
+                ariaLabel="loading-indicator"
+                height={30}
+                width={30}
+                strokeWidth={5}
+                color="red"
+                secondaryColor="red"
+              />
+            ) : (
+              relatedCapsList.map((cap) => {
+                return (
+                  <div key={cap.id} className="basis-1/3 text-center">
+                    {cap.name}
+                    {cap.media_gallery_entries &&
+                      cap.media_gallery_entries.map((image, imageIndex) => {
+                        if (
+                          image.types.indexOf('feed_image') >= 0 ||
+                          image.types.indexOf('main_image') >= 0
+                        ) {
+                          return null;
+                        }
+                        if (
+                          image.types.indexOf('gallery_image_1') >= 0 ||
+                          image.types.indexOf('gallery_image_2') >= 0 ||
+                          image.types.indexOf('gallery_image_3') >= 0 ||
+                          image.types.indexOf('gallery_image_4') >= 0
+                        ) {
+                          return null;
+                        }
 
-                            return (
-                              <Image
-                                key={imageIndex}
-                                src={
-                                  process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL +
-                                  image.file
-                                }
-                                alt={product.name}
-                                width={268}
-                                height={175}
-                                layout="responsive"
-                              />
-                            );
-                          })}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          ))}
+                        return (
+                          <Image
+                            key={imageIndex}
+                            src={
+                              process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL +
+                              image.file
+                            }
+                            alt={product.name}
+                            width={268}
+                            height={175}
+                            layout="responsive"
+                          />
+                        );
+                      })}
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
       </div>
     </MainContainer>
   );
