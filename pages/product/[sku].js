@@ -55,7 +55,7 @@ export default function Product({ product, colors, catalogPage, language }) {
     }
   });
 
-  console.log(product);
+  //console.log(product);
 
   // const { data: colors } = useSWR(
   //   `${process.env.NEXT_PUBLIC_API_URL}/rest/${lang}/V1/products/attributes/color`
@@ -67,18 +67,46 @@ export default function Product({ product, colors, catalogPage, language }) {
   const { data: products } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/rest/${lang}/V1/varsity-products?
   searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=visibility&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=4&
-  searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=type_id&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=configurable&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=series&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=${product.filter_series}`
+  searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bfield%5D=type_id&searchCriteria%5BfilterGroups%5D%5B0%5D%5Bfilters%5D%5B1%5D%5Bvalue%5D=configurable`
   );
 
-  const filteredProducts = products
-    ? products.items.filter(
-        (item) => item.type_id !== 'simple' && item.status !== 2
-      )
-    : null;
+  let seriesCaps;
+  let relatedCapsList;
+
+  if (products) {
+    const filteredProducts = products.items.filter(
+      (item) => item.type_id !== 'simple' && item.status !== 2
+    );
+
+    filteredProducts.forEach((product) => {
+      product.custom_attributes.forEach((item) => {
+        if (item.attribute_code == 'series') {
+          product.series = parseInt(item.value);
+        }
+      });
+    });
+
+    seriesCaps = filteredProducts.filter(
+      (item) => item.series == product.filter_series
+    );
+
+    const relatedCaps = product.product_links.filter(
+      (item) => item.link_type == 'related'
+    );
+    const relatedCapsArray = relatedCaps.map((item) => item.linked_product_sku);
+
+    relatedCapsList = relatedCapsArray.map((item) => {
+      var relatedCap = filteredProducts.find((cap) => cap.sku == item);
+      return relatedCap;
+    });
+    console.log('relatedCapsList', relatedCapsList);
+  }
+
+  //console.log('seriesCaps', seriesCaps);
 
   return (
     <MainContainer title={product.name}>
-      <div className="mx-auto max-w-[1088px] flex flex-row">
+      <div className="mx-auto max-w-[1088px] flex flex-wrap">
         <div className="basis-2/3 pr-10">
           {product.media_gallery_entries &&
             product.media_gallery_entries.map((image, imageIndex) => {
@@ -132,7 +160,7 @@ export default function Product({ product, colors, catalogPage, language }) {
                 secondaryColor="red"
               />
             ) : (
-              filteredProducts.map((color) => {
+              seriesCaps.map((color) => {
                 let productColor = '';
                 let colorCode = '';
                 let isCurrent = color.sku == product.sku ? true : false;
@@ -188,6 +216,61 @@ export default function Product({ product, colors, catalogPage, language }) {
           <hr className="my-5" />
           <div dangerouslySetInnerHTML={{ __html: product.size_fit }}></div>
         </div>
+        {!products ||
+          (relatedCapsList.length > 0 && (
+            <div className="basis-full">
+              <hr className="my-5" />
+              <h2 className="text-center mb-5 text-lg">Related products</h2>
+              <div className="flex flex-row gap-5">
+                {!products ? (
+                  <Oval
+                    ariaLabel="loading-indicator"
+                    height={30}
+                    width={30}
+                    strokeWidth={5}
+                    color="red"
+                    secondaryColor="red"
+                  />
+                ) : (
+                  relatedCapsList.map((cap) => {
+                    return (
+                      <div key={cap.id} className="basis-1/3 text-center">
+                        {cap.name}
+                        {cap.media_gallery_entries &&
+                          cap.media_gallery_entries.map((image, imageIndex) => {
+                            if (image.types.indexOf('feed_image') >= 0) {
+                              return null;
+                            }
+                            if (
+                              image.types.indexOf('gallery_image_1') >= 0 ||
+                              image.types.indexOf('gallery_image_2') >= 0 ||
+                              image.types.indexOf('gallery_image_3') >= 0 ||
+                              image.types.indexOf('gallery_image_4') >= 0
+                            ) {
+                              return null;
+                            }
+
+                            return (
+                              <Image
+                                key={imageIndex}
+                                src={
+                                  process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL +
+                                  image.file
+                                }
+                                alt={product.name}
+                                width={268}
+                                height={175}
+                                layout="responsive"
+                              />
+                            );
+                          })}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+          ))}
       </div>
     </MainContainer>
   );
