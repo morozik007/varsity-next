@@ -5,6 +5,8 @@ import MainContainer from '../components/MainContainer';
 const Catalog = ({ products }) => {
   const { items } = products;
 
+  console.log(items);
+
   items.forEach((item) => {
     item.custom_attributes.forEach((i) => {
       if (i.attribute_code == 'show_only_campaign') {
