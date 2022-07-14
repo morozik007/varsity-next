@@ -41,6 +41,18 @@ export default function Product({ product, colors, catalogPage, language }) {
     if (item.attribute_code == 'series') {
       product.filter_series = parseInt(item.value);
     }
+    if (item.attribute_code === 'use_care') {
+      product.usecare = item.value;
+    }
+    if (item.attribute_code === 'fabrics_specifications') {
+      product.specifications = item.value;
+    }
+    if (item.attribute_code === 'shipping_returns_payments') {
+      product.shipping_returns = item.value;
+    }
+    if (item.attribute_code === 'size_fit') {
+      product.size_fit = item.value;
+    }
   });
 
   console.log(product);
@@ -163,6 +175,18 @@ export default function Product({ product, colors, catalogPage, language }) {
               })
             )}
           </div>
+          <hr className="my-5" />
+          <div dangerouslySetInnerHTML={{ __html: product.usecare }}></div>
+          <hr className="my-5" />
+          <div
+            dangerouslySetInnerHTML={{ __html: product.specifications }}
+          ></div>
+          <hr className="my-5" />
+          <div
+            dangerouslySetInnerHTML={{ __html: product.shipping_returns }}
+          ></div>
+          <hr className="my-5" />
+          <div dangerouslySetInnerHTML={{ __html: product.size_fit }}></div>
         </div>
       </div>
     </MainContainer>
