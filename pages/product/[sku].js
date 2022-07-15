@@ -1,9 +1,14 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import useSWR from 'swr';
 import { useRouter } from 'next/router';
 import { Oval } from 'react-loader-spinner';
 import MainContainer from '../../components/MainContainer';
+import ProductItem from '../../components/Product';
+import ProductColor from '../../components/ProductColor';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Lazy, Pagination } from 'swiper';
+import 'swiper/css';
+import 'swiper/css/pagination';
 
 export default function Product({ product, colors, catalogPage, language }) {
   const { custom_attributes } = product;
@@ -99,7 +104,7 @@ export default function Product({ product, colors, catalogPage, language }) {
       var relatedCap = filteredProducts.find((cap) => cap.sku == item);
       return relatedCap;
     });
-    console.log('relatedCapsList', relatedCapsList);
+    //console.log('relatedCapsList', relatedCapsList);
   }
 
   //console.log('seriesCaps', seriesCaps);
@@ -107,37 +112,53 @@ export default function Product({ product, colors, catalogPage, language }) {
   return (
     <MainContainer title={product.name}>
       <div className="mx-auto max-w-[1088px] flex flex-wrap">
-        <div className="basis-2/3 pr-10">
-          {product.media_gallery_entries &&
-            product.media_gallery_entries.map((image, imageIndex) => {
-              if (image.types.indexOf('feed_image') >= 0) {
-                return null;
-              }
-              if (
-                image.types.indexOf('gallery_image_1') >= 0 ||
-                image.types.indexOf('gallery_image_2') >= 0 ||
-                image.types.indexOf('gallery_image_3') >= 0 ||
-                image.types.indexOf('gallery_image_4') >= 0
-              ) {
-                return null;
-              }
+        <div className="w-full lg:w-3/5">
+          <Swiper
+            modules={[Lazy, Pagination]}
+            lazy={true}
+            pagination={{
+              clickable: true,
+            }}
+            spaceBetween={0}
+            slidesPerView={1}
+            className="mySwiper"
+          >
+            {product.media_gallery_entries &&
+              product.media_gallery_entries.map((image, imageIndex) => {
+                if (image.types.indexOf('feed_image') >= 0) {
+                  return null;
+                }
+                if (
+                  image.types.indexOf('gallery_image_1') >= 0 ||
+                  image.types.indexOf('gallery_image_2') >= 0 ||
+                  image.types.indexOf('gallery_image_3') >= 0 ||
+                  image.types.indexOf('gallery_image_4') >= 0
+                ) {
+                  return null;
+                }
 
-              const LCP = imageIndex == 0 ? true : false;
+                const LCP = imageIndex == 0 ? true : false;
 
-              return (
-                <Image
-                  key={imageIndex}
-                  src={process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + image.file}
-                  alt={product.name}
-                  width={268}
-                  height={175}
-                  layout="responsive"
-                  priority={LCP}
-                />
-              );
-            })}
+                return (
+                  <SwiperSlide>
+                    <Image
+                      key={imageIndex}
+                      src={
+                        process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + image.file
+                      }
+                      alt={product.name}
+                      width={268}
+                      height={175}
+                      layout="responsive"
+                      priority={LCP}
+                      className="swiper-lazy"
+                    />
+                  </SwiperSlide>
+                );
+              })}
+          </Swiper>
         </div>
-        <div className="basis-1/3">
+        <div className="w-full pl-0 lg:w-2/5 lg:pl-12 ">
           <h1 className="text-3xl mb-5 text-main">{product.name}</h1>
           <div
             dangerouslySetInnerHTML={{ __html: product.short_description }}
@@ -160,47 +181,12 @@ export default function Product({ product, colors, catalogPage, language }) {
                 secondaryColor="red"
               />
             ) : (
-              seriesCaps.map((color) => {
-                let productColor = '';
-                let colorCode = '';
-                let isCurrent = color.sku == product.sku ? true : false;
-
-                //console.log('isCurrent', isCurrent);
-
-                color.custom_attributes.map((attribute) => {
-                  if (attribute.attribute_code === 'color') {
-                    productColor = attribute.value;
-                  }
-                });
-
-                let currentColor = colors.options.find(
-                  (c) => c.value == parseInt(productColor)
-                );
-
-                colorCode = catalogPage[0].catalog_page_color_values.find(
-                  (colorItem) =>
-                    colorItem.link_and_lab_label === currentColor.label
-                );
-
-                return (
-                  <Link key={color.id} href={`/product/${color.sku}`}>
-                    <a
-                      className={`block w-8 h-8 mr-4 mb-4 indent-36 rounded overflow-hidden outline outline-offset-0 outline-gray-500/[0.3] ${
-                        +isCurrent &&
-                        'cursor-default pointer-events-none outline-red-500/[0.9]'
-                      }`}
-                      title={currentColor.label}
-                      style={{
-                        backgroundColor: colorCode.link_and_lab_url
-                          ? colorCode.link_and_lab_url
-                          : '#9ACD32',
-                      }}
-                    >
-                      {currentColor.label}
-                    </a>
-                  </Link>
-                );
-              })
+              seriesCaps.map((color, index) => (
+                <ProductColor
+                  {...{ color, colors, product, catalogPage }}
+                  key={index}
+                />
+              ))
             )}
           </div>
           <hr className="my-5" />
@@ -219,7 +205,7 @@ export default function Product({ product, colors, catalogPage, language }) {
         <div className="basis-full">
           <hr className="my-5" />
           <h2 className="text-center mb-5 text-lg">Related products</h2>
-          <div className="flex flex-row gap-5 justify-center">
+          <div className="flex flex-row flex-wrap justify-center">
             {!products ? (
               <Oval
                 ariaLabel="loading-indicator"
@@ -232,39 +218,8 @@ export default function Product({ product, colors, catalogPage, language }) {
             ) : (
               relatedCapsList.map((cap) => {
                 return (
-                  <div key={cap.id} className="basis-1/3 text-center">
-                    {cap.name}
-                    {cap.media_gallery_entries &&
-                      cap.media_gallery_entries.map((image, imageIndex) => {
-                        if (
-                          image.types.indexOf('feed_image') >= 0 ||
-                          image.types.indexOf('main_image') >= 0
-                        ) {
-                          return null;
-                        }
-                        if (
-                          image.types.indexOf('gallery_image_1') >= 0 ||
-                          image.types.indexOf('gallery_image_2') >= 0 ||
-                          image.types.indexOf('gallery_image_3') >= 0 ||
-                          image.types.indexOf('gallery_image_4') >= 0
-                        ) {
-                          return null;
-                        }
-
-                        return (
-                          <Image
-                            key={imageIndex}
-                            src={
-                              process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL +
-                              image.file
-                            }
-                            alt={product.name}
-                            width={268}
-                            height={175}
-                            layout="responsive"
-                          />
-                        );
-                      })}
+                  <div key={cap.id} className="w-[346px] px-5 text-center">
+                    <ProductItem product={cap} />
                   </div>
                 );
               })

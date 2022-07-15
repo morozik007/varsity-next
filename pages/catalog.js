@@ -1,11 +1,10 @@
-import Link from 'next/link';
-import Image from 'next/image';
 import MainContainer from '../components/MainContainer';
+import ProductItem from '../components/Product';
 
 const Catalog = ({ products }) => {
   const { items } = products;
 
-  console.log(items);
+  //console.log(items);
 
   items.forEach((item) => {
     item.custom_attributes.forEach((i) => {
@@ -32,21 +31,7 @@ const Catalog = ({ products }) => {
               key={p.id}
               className="text-center border-solid border-2 border-black"
             >
-              <Link href={`/product/${p.sku}`}>
-                <a>
-                  <Image
-                    src={process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + p.image}
-                    alt={p.name}
-                    width={268}
-                    height={175}
-                    layout="responsive"
-                    className="cursor-pointer"
-                  />
-                </a>
-              </Link>
-              <Link href={`/product/${p.sku}`}>
-                <a>{p.name}</a>
-              </Link>
+              <ProductItem product={p} />
             </li>
           ))}
         </ul>
