@@ -6,6 +6,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 
 const ProductItem = ({ product }) => {
+  console.log(product);
   return (
     <>
       <Swiper

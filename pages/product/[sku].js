@@ -10,7 +10,13 @@ import { Lazy, Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
 
-export default function Product({ product, colors, catalogPage, language }) {
+export default function Product({
+  product,
+  colors,
+  catalogPage,
+  children,
+  language,
+}) {
   const { custom_attributes } = product;
   const router = useRouter();
   const lang =
@@ -60,7 +66,24 @@ export default function Product({ product, colors, catalogPage, language }) {
     }
   });
 
-  //console.log(product);
+  console.log('children', children);
+
+  children.forEach((childProduct) => {
+    childProduct.custom_attributes.forEach((item) => {
+      if (item.attribute_code == 'image') {
+        childProduct.image = item.value;
+      }
+      if (item.attribute_code == 'special_price') {
+        childProduct.price = Number(item.value).toFixed(0);
+      }
+      if (item.attribute_code == 'cap_size') {
+        childProduct.cap_size = item.value;
+      }
+    });
+    // promises.push(
+    //   serverFetchItems(processId, storeView, 'stockItems/' + childProduct.sku)
+    // );
+  });
 
   // const { data: colors } = useSWR(
   //   `${process.env.NEXT_PUBLIC_API_URL}/rest/${lang}/V1/products/attributes/color`
@@ -190,6 +213,17 @@ export default function Product({ product, colors, catalogPage, language }) {
             )}
           </div>
           <hr className="my-5" />
+          <p className="mb-2">
+            <b>Sizes</b>
+          </p>
+          <div>
+            {children.map((child, index) => (
+              <span className="pr-3" key={index}>
+                {child.cap_size}
+              </span>
+            ))}
+          </div>
+          <hr className="my-5" />
           <div dangerouslySetInnerHTML={{ __html: product.usecare }}></div>
           <hr className="my-5" />
           <div
@@ -251,6 +285,11 @@ export async function getServerSideProps(context) {
   );
   const product = await response.json();
 
+  const responseChildren = await fetch(
+    `${process.env.API_URL}/rest/${lang}/V1/configurable-products/${context.params.sku}/children`
+  );
+  const children = await responseChildren.json();
+
   const responseColors = await fetch(
     `${process.env.API_URL}/rest/${lang}/V1/products/attributes/color`
   );
@@ -272,6 +311,7 @@ export async function getServerSideProps(context) {
       product,
       colors,
       catalogPage,
+      children,
       language: context.locale,
     },
   };
