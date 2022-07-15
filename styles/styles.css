@@ -9,3 +9,13 @@
 .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction {
   bottom: 5px !important;
 }
+
+.basic-page p {
+  margin-bottom: 20px;
+}
+
+.basic-page h2 {
+  margin-bottom: 5px;
+  font-size: 18px;
+  font-weight: bold;
+}

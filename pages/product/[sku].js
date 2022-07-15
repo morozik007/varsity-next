@@ -9,6 +9,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Lazy, Pagination } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import 'swiper/css/lazy';
 
 export default function Product({
   product,
@@ -131,7 +132,7 @@ export default function Product({
     //console.log('relatedCapsList-2', relatedCapsList);
   }
 
-  //console.log('seriesCaps', seriesCaps);
+  console.log('product', product);
 
   return (
     <MainContainer title={product.name}>
@@ -176,6 +177,7 @@ export default function Product({
                       priority={LCP}
                       className="swiper-lazy"
                     />
+                    <div className="swiper-lazy-preloader swiper-lazy-preloader-black"></div>
                   </SwiperSlide>
                 );
               })}

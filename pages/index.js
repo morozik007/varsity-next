@@ -5,9 +5,9 @@ const Index = () => {
   //console.log(products);
 
   return (
-    <>
-      <MainContainer title={'Home'}>index</MainContainer>
-    </>
+    <MainContainer title={'Home'}>
+      <div className="mx-auto max-w-[1088px]">index</div>
+    </MainContainer>
   );
 };
 
