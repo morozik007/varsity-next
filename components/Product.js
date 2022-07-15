@@ -19,7 +19,7 @@ const ProductItem = ({ product }) => {
         className="mySwiper"
       >
         {product.media_gallery_entries ? (
-          product.media_gallery_entries.map((image, imageIndex) => {
+          product.media_gallery_entries.map((image, index) => {
             if (
               image.types.indexOf('feed_image') >= 0 ||
               image.types.indexOf('main_image') >= 0
@@ -35,11 +35,11 @@ const ProductItem = ({ product }) => {
               return null;
             }
 
-            const LCP = imageIndex == 0 ? true : false;
+            const LCP = index == 0 ? true : false;
 
             return (
-              <SwiperSlide>
-                <Link href={`/product/${product.sku}`} key={imageIndex}>
+              <SwiperSlide key={index}>
+                <Link href={`/product/${product.sku}`}>
                   <a>
                     <Image
                       src={

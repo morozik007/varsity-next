@@ -104,7 +104,8 @@ export default function Product({ product, colors, catalogPage, language }) {
       var relatedCap = filteredProducts.find((cap) => cap.sku == item);
       return relatedCap;
     });
-    //console.log('relatedCapsList', relatedCapsList);
+    relatedCapsList = relatedCapsList.filter((item) => item); //remove undefined (disabled products)
+    //console.log('relatedCapsList-2', relatedCapsList);
   }
 
   //console.log('seriesCaps', seriesCaps);
@@ -140,9 +141,8 @@ export default function Product({ product, colors, catalogPage, language }) {
                 const LCP = imageIndex == 0 ? true : false;
 
                 return (
-                  <SwiperSlide>
+                  <SwiperSlide key={imageIndex}>
                     <Image
-                      key={imageIndex}
                       src={
                         process.env.NEXT_PUBLIC_CATALOG_IMAGE_URL + image.file
                       }
@@ -216,9 +216,9 @@ export default function Product({ product, colors, catalogPage, language }) {
                 secondaryColor="red"
               />
             ) : (
-              relatedCapsList.map((cap) => {
+              relatedCapsList.map((cap, index) => {
                 return (
-                  <div key={cap.id} className="w-[346px] px-5 text-center">
+                  <div key={index} className="w-[346px] px-5 text-center">
                     <ProductItem product={cap} />
                   </div>
                 );
