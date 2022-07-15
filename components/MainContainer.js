@@ -12,7 +12,7 @@ const MainContainer = ({ children, title }) => {
 
       <div className="flex flex-col h-screen justify-between">
         <Header />
-        <main className="mb-auto px-5 py-7">{children}</main>
+        <main className="mb-auto px-5 pt-24 pb-7">{children}</main>
         <Footer />
       </div>
     </>
