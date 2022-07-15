@@ -7,6 +7,7 @@ const MainContainer = ({ children, title }) => {
     <>
       <Head>
         <title>{title}</title>
+        <meta name="robots" content="noindex, nofollow" />
       </Head>
 
       <div className="flex flex-col h-screen justify-between">
