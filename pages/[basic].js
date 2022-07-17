@@ -1,15 +1,15 @@
 import { useRouter } from 'next/router';
 import MainContainer from '../components/MainContainer';
 
-const Basic = ({ basicPages }) => {
-  console.log(basicPages);
+const Basic = ({ basicPage }) => {
   const router = useRouter();
-  const Page = basicPages.filter((item) => item.url_key == router.query.basic);
+  // const Page = basicPages.filter((item) => item.url_key == router.query.basic);
+  //console.log(basicPage);
 
   return (
-    <MainContainer title={Page[0].title}>
+    <MainContainer title={basicPage.title}>
       <div
-        dangerouslySetInnerHTML={{ __html: Page[0].basic_content }}
+        dangerouslySetInnerHTML={{ __html: basicPage.basic_content }}
         className="basic-page mx-auto max-w-[1088px]"
       ></div>
     </MainContainer>
@@ -35,13 +35,17 @@ export async function getServerSideProps(context) {
   );
   const basicPages = await response.json();
 
-  if (!basicPages) {
+  const Page = basicPages.filter((item) => item.url_key == context.query.basic);
+
+  const basicPage = Object.assign({}, Page[0]);
+
+  if (!basicPage) {
     return {
       notFound: true,
     };
   }
 
   return {
-    props: { basicPages },
+    props: { basicPage },
   };
 }
