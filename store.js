@@ -1,5 +1,8 @@
-import { createContext } from 'react';
+import { configureStore } from '@reduxjs/toolkit';
+import currencySlice from './slices/currencySlice';
 
-const Store = createContext(null);
-
-export default Store;
+export const store = configureStore({
+  reducer: {
+    currency: currencySlice,
+  },
+});

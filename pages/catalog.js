@@ -42,7 +42,7 @@ const Catalog = ({ products }) => {
 
 export default Catalog;
 
-export async function getStaticProps(context) {
+export async function getServerSideProps(context) {
   const lang =
     context.locale === 'no'
       ? 'default'
